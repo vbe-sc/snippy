@@ -279,6 +279,12 @@ static snippy::opt<std::string> ModelPluginFile(
              "Use =None to disable snippet execution on the model."),
     cl::value_desc("filename"), cl::cat(Options), cl::init("libRISCVModel.so"));
 
+static snippy::opt<std::string> DbPluginFile(
+    "db-plugin",
+    cl::desc("Primary model plugin for using database values in snippet generation"
+             "Use =None to disable snippet execution on the model."),
+    cl::value_desc("filename"), cl::cat(Options), cl::init("libSQLiteDB.so"));
+
 static snippy::opt_list<std::string>
     CoSimModelPluginFilesList("cosim-model-plugins", cl::CommaSeparated,
                               cl::desc("Comma separated list of hardware model "
@@ -532,6 +538,19 @@ std::vector<std::string> parseModelPluginList() {
   copy(CoSimModelPluginFilesList, std::back_inserter(Ret));
   erase(Ret, "None");
 
+  return Ret;
+}
+
+std::vector<std::string> parseDbPluginList() {
+  if ((!DbPluginFile.isSpecified() ||
+       DbPluginFile.getValue() == "None"))
+    snippy::fatal(formatv("--{0}"
+                          " can only be used when value specified",
+                          CoSimModelPluginFilesList.ArgStr,
+                          DbPluginFile.ArgStr));
+
+  std::vector<std::string> Ret{DbPluginFile.getValue()};
+  erase(Ret, "None");
   return Ret;
 }
 
@@ -1039,7 +1058,8 @@ static void checkGlobalRegsSpillSettings(const SnippyTarget &Tgt,
 
 GeneratorSettings createGeneratorConfig(LLVMState &State, Config &&Cfg,
                                         RegPool &RP,
-                                        ArrayRef<std::string> Models) {
+                                        ArrayRef<std::string> Models,
+                                        ArrayRef<std::string> Dbs) {
   auto &Ctx = State.getCtx();
   auto OutputFilename = getOutputFileBasename();
   auto SelfCheckPeriod = getSelfcheckPeriod();
@@ -1084,7 +1104,7 @@ GeneratorSettings createGeneratorConfig(LLVMState &State, Config &&Cfg,
                                       State.getSnippyTarget(), Cfg,
                                       FillCodeSectionMode, SelfCheckPeriod);
   bool RunOnModel = !Models.empty();
-
+  bool RunOnDb = !Dbs.empty();
   return GeneratorSettings(
       ABI, OutputFilename, LayoutFile.getValue(), AdditionalLayoutFiles,
       TrackingOptions{Backtrack, SelfCheckPeriod, AddressVHOpt},
@@ -1092,6 +1112,7 @@ GeneratorSettings createGeneratorConfig(LLVMState &State, Config &&Cfg,
       LinkerOptions{ExternalStackOpt, MangleExportedNames,
                     std::move(EntryPointName.getValue())},
       ModelPluginOptions{RunOnModel, std::move(Models)},
+      DbPluginOptions{RunOnDb, std::move(Dbs)},
       InstrsGenerationOptions{VerifyMachineInstrs, ChainedRXSectionsFill,
                               ChainedRXSorted, ChunkSize, NumPrimaryInstrs,
                               std::move(LastInstr)},
@@ -1108,9 +1129,10 @@ GeneratorSettings createGeneratorConfig(LLVMState &State, Config &&Cfg,
 
 static FlowGenerator createFlowGenerator(Config &&Cfg, LLVMState &State,
                                          const OpcodeCache &OpCC,
-                                         ArrayRef<std::string> Models) {
+                                         ArrayRef<std::string> Models, 
+                                         ArrayRef<std::string> Dbs) {
   RegPool RP;
-  auto GenSettings = createGeneratorConfig(State, std::move(Cfg), RP, Models);
+  auto GenSettings = createGeneratorConfig(State, std::move(Cfg), RP, Models, Dbs);
   return FlowGenerator(std::move(GenSettings), OpCC, std::move(RP));
 }
 
@@ -1177,13 +1199,14 @@ void generateMain() {
   auto Cfg = readSnippyConfig(State.getCtx(), State.getSnippyTarget(), OpCC,
                               State.getInstrInfo(), State.getTargetMachine());
   auto Models = parseModelPluginList();
+  auto Dbs = parseDbPluginList();
   completeConfig(Cfg, State, OpCC, !Models.empty());
   dumpConfigIfNeeded(
       Cfg,
       ConfigIOContext{OpCC, State.getCtx(), State.getSnippyTarget(),
                       State.getInstrInfo(), State.getTargetMachine()},
       outs());
-  auto Flow = createFlowGenerator(std::move(Cfg), State, OpCC, Models);
+  auto Flow = createFlowGenerator(std::move(Cfg), State, OpCC, Models, Dbs);
   auto Result = Flow.generate(State);
   saveToFile(Result);
 }

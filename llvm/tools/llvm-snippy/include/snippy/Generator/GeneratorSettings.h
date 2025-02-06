@@ -49,6 +49,11 @@ struct LinkerOptions {
   std::string EntryPointName;
 };
 
+struct DbPluginOptions {
+  bool RunOnModel;
+  std::vector<std::string> DbLibraries;
+};
+
 struct ModelPluginOptions {
   bool RunOnModel;
   std::vector<std::string> ModelLibraries;
@@ -105,6 +110,7 @@ public:
   DebugOptions DebugConfig;
   LinkerOptions LinkerConfig;
   ModelPluginOptions ModelPluginConfig;
+  DbPluginOptions DbPluginConfig;
   InstrsGenerationOptions InstrsGenerationConfig;
   RegistersOptions RegistersConfig;
 
@@ -124,6 +130,7 @@ public:
                     TrackingOptions &&TrackingConfig,
                     DebugOptions &&DebugConfig, LinkerOptions &&LinkerConfig,
                     ModelPluginOptions &&ModelPluginConfig,
+                    DbPluginOptions  &&DbPluginConfig,
                     InstrsGenerationOptions &&InstrsGenerationConfig,
                     RegistersOptions &&RegsConfig, Config &&Cfg)
       : ABIName(std::move(ABIName)), BaseFileName(std::move(BaseFileName)),
@@ -133,6 +140,7 @@ public:
         DebugConfig(std::move(DebugConfig)),
         LinkerConfig(std::move(LinkerConfig)),
         ModelPluginConfig(std::move(ModelPluginConfig)),
+        DbPluginConfig(std::move(DbPluginConfig)),
         InstrsGenerationConfig(std::move(InstrsGenerationConfig)),
         RegistersConfig(std::move(RegsConfig)), Cfg(std::move(Cfg)) {}
 
