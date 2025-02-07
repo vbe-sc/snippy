@@ -54,6 +54,10 @@ struct DbPluginOptions {
   std::vector<std::string> DbLibraries;
 };
 
+struct DbPathOptions {
+  std::string DbPath;
+};
+
 struct ModelPluginOptions {
   bool RunOnModel;
   std::vector<std::string> ModelLibraries;
@@ -79,6 +83,7 @@ struct SnippyProgramSettings {
   bool ExternalStack;
   std::string EntryPointName;
   std::string InitialRegYamlFile;
+  std::string PathToDB;
 
   SnippyProgramSettings(SectionsDescriptions Sections, MCRegister StackPointer,
                         bool MangleExportedNames, bool FollowTargetABI,
@@ -111,6 +116,7 @@ public:
   LinkerOptions LinkerConfig;
   ModelPluginOptions ModelPluginConfig;
   DbPluginOptions DbPluginConfig;
+  DbPathOptions DbPathConfig;
   InstrsGenerationOptions InstrsGenerationConfig;
   RegistersOptions RegistersConfig;
 
@@ -131,6 +137,7 @@ public:
                     DebugOptions &&DebugConfig, LinkerOptions &&LinkerConfig,
                     ModelPluginOptions &&ModelPluginConfig,
                     DbPluginOptions  &&DbPluginConfig,
+                    DbPathOptions  &&DbPathConfig,
                     InstrsGenerationOptions &&InstrsGenerationConfig,
                     RegistersOptions &&RegsConfig, Config &&Cfg)
       : ABIName(std::move(ABIName)), BaseFileName(std::move(BaseFileName)),
@@ -141,6 +148,7 @@ public:
         LinkerConfig(std::move(LinkerConfig)),
         ModelPluginConfig(std::move(ModelPluginConfig)),
         DbPluginConfig(std::move(DbPluginConfig)),
+        DbPathConfig(std::move(DbPathConfig)),
         InstrsGenerationConfig(std::move(InstrsGenerationConfig)),
         RegistersConfig(std::move(RegsConfig)), Cfg(std::move(Cfg)) {}
 

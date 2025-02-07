@@ -222,7 +222,7 @@ ValuegramGenPolicy::generateRegInit(InstructionGenerationContext &InstrGenCtx,
     auto ValueToWrite = getValueFromValuegram(
         SimpleReg, getRegistersPrefix(Tgt.regToStorage(SimpleReg)),
         InstrGenCtx);
-    SmallVector<MCInst> InstrsForWrite;
+    SmallVector<MCInst> InstrsForWrite; 
     Tgt.generateWriteValueSeq(InstrGenCtx, ValueToWrite, SimpleReg.asMCReg(),
                               InstrsForWrite);
     llvm::transform(

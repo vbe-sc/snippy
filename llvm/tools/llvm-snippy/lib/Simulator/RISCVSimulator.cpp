@@ -479,10 +479,6 @@ static constexpr const char *SimulatorEntryPointSymbol =
     D_XSTRINGIFY(RVMAPI_ENTRY_POINT_SYMBOL);
 static constexpr const char *InterfaceVersionSymbol =
     D_XSTRINGIFY(RVMAPI_VERSION_SYMBOL);
-  static constexpr const char *DbEntryPointSymbol =
-    D_XSTRINGIFY(RVDBAPI_ENTRY_POINT_SYMBOL);
-static constexpr const char *DbInterfaceVersionSymbol =
-    D_XSTRINGIFY(RVDBAPI_VERSION_SYMBOL);
 #undef D_XSTRINGIFY
 #undef D_STRINGIFY
 
@@ -514,17 +510,6 @@ getSimulatorEntryPoint(llvm::snippy::DynamicLibrary &ModelLib) {
   return *VTable;
 }
 
-static const rvdb::RVDB_FunctionPointers &
-getDbEntryPoint(llvm::snippy::DynamicLibrary &DbLib) {
-  checkModelInterfaceVersion(DbLib, RVDBAPI_CURRENT_INTERFACE_VERSION);
-  const auto *VTable = reinterpret_cast<const rvm::RVDB_FunctionPointers *>(
-      DbLib.getAddressOfSymbol(DbEntryPointSymbol));
-  if (!VTable)
-    snippy::fatal(
-        formatv("could not find entry point <{0}> to create simulator",
-                DbEntryPointSymbol));
-  return *VTable;
-}
 
 void MemUpdateCallback(RVMCallbackHandler *H, uint64_t Addr, const char *Data,
                        size_t Size) {
