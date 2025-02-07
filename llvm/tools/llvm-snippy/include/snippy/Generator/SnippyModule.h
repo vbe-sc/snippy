@@ -19,6 +19,8 @@
 #include "llvm/CodeGen/MachineModuleInfo.h"
 #include "llvm/Support/Debug.h"
 
+#include "../Simulator/Targets/DBManager.h"
+
 namespace llvm {
 class TargetSubtargetInfo;
 } // namespace llvm
@@ -235,6 +237,7 @@ private:
 
   const OpcodeCache *OpCC = nullptr;
   std::unique_ptr<Linker> PLinker;
+  std::unique_ptr<DBManager> DB;
 
   constexpr static auto SmallStringDefaultSize = 16;
   constexpr static auto SCStride = 16u;

@@ -51,7 +51,7 @@ struct LinkerOptions {
 
 struct DbPluginOptions {
   bool RunOnModel;
-  std::vector<std::string> DbLibraries;
+  std::string DbLibraries;
 };
 
 struct DbPathOptions {
@@ -83,17 +83,21 @@ struct SnippyProgramSettings {
   bool ExternalStack;
   std::string EntryPointName;
   std::string InitialRegYamlFile;
+  std::string PathToDbLibrary;
   std::string PathToDB;
 
   SnippyProgramSettings(SectionsDescriptions Sections, MCRegister StackPointer,
                         bool MangleExportedNames, bool FollowTargetABI,
                         bool ExternalStack, StringRef EntryPointName,
-                        StringRef InitialRegYamlFile)
+                        StringRef InitialRegYamlFile, StringRef PathToDbLibrary, 
+                        StringRef PathToDB)
       : Sections(std::move(Sections)), StackPointer(StackPointer),
         MangleExportedNames(MangleExportedNames),
         FollowTargetABI(FollowTargetABI), ExternalStack(ExternalStack),
         EntryPointName(EntryPointName),
-        InitialRegYamlFile(InitialRegYamlFile){};
+        InitialRegYamlFile(InitialRegYamlFile),
+        PathToDbLibrary(PathToDbLibrary),
+        PathToDB(PathToDB){};
 };
 
 enum class GenerationMode {
@@ -127,7 +131,7 @@ public:
         getCompleteSectionList(State), RegistersConfig.StackPointer,
         LinkerConfig.MangleExportedNames, RegistersConfig.FollowTargetABI,
         LinkerConfig.ExternalStack, LinkerConfig.EntryPointName,
-        RegistersConfig.InitialRegYamlFile);
+        RegistersConfig.InitialRegYamlFile, DbPathConfig.DbPath, DbPluginConfig.DbLibraries);
   }
 
   GeneratorSettings(std::string ABIName, std::string BaseFileName,

@@ -1,11 +1,3 @@
-//===-- SnippyDB.h ---------------------------------------------------*- C++ -*-===//
-//
-// Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
-// See https://llvm.org/LICENSE.txt for license information.
-// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-//
-//===----------------------------------------------------------------------===//
-
 #pragma once
 
 #include <cstdint>
@@ -49,16 +41,18 @@ typedef struct RVDBConfig RVDBConfig;
 
 struct RVDBConfig {
   const char* dataBasePath;
-  const struct llvm::snippy::database::SnippyDB::Operands* ops;
-  uint64_t rows;
-  llvm::snippy::database::SnippyDB::Order order;
-  uint64_t opType;
 };
 
 typedef struct RVDBState RVDBState;
 
 typedef RVDBState* (*rvdb_initDatabase_t)(const RVDBConfig *);
-typedef void (*rvdb_getOperandsByRows_t)(const RVDBState *);
+typedef void (*rvdb_getOperandsByRows_t)(
+  const RVDBState *,
+  const struct llvm::snippy::database::SnippyDB::Operands*,
+  uint64_t,
+  llvm::snippy::database::SnippyDB::Order,
+  uint64_t
+);
 typedef void (*rvdb_closeDatabase_t)(RVDBState *);
 
 }

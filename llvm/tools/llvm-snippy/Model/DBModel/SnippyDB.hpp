@@ -50,30 +50,16 @@ public:
       DBConfig.dataBasePath = dataBasePath;
       return *this;
     }
-
-    Builder &setOps(const struct llvm::snippy::database::SnippyDB::Operands* ops) {
-      DBConfig.ops = ops;
-      return *this;
-    }
-
-    Builder &setRows(uint64_t rows) {
-      DBConfig.rows = rows;
-      return *this;
-    }
-
-    Builder &setOrder(llvm::snippy::database::SnippyDB::Order order) {
-      DBConfig.order = order;
-      return *this;
-    }
-
-    Builder &setOpType(uint64_t opType) {
-      DBConfig.opType = opType;
-      return *this;
-    }
-
-    State build() { return {DBTable, &DBConfig}; }
+    
+    State build() { return State{DBTable, &DBConfig}; }
   };
+  State(const RVDB_FunctionPointers *DBTable, const RVDBConfig *Config)
+      : pimpl(DBTable->initDatabase(Config), StateDeleter{DBTable}) {
+    assert(DBTable);
+  }
 
+  RVDBState *get() { return pimpl.get(); }
+  const RVDBState *get() const { return pimpl.get(); }
 };
 
 }

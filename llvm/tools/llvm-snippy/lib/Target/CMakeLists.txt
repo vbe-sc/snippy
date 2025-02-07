@@ -16,6 +16,7 @@ add_llvm_library(LLVMSnippyTarget
   DISABLE_LLVM_LINK_LLVM_DYLIB
   STATIC
     Target.cpp
+    DBManager.cpp
   DEPENDS
     intrinsics_gen
   )

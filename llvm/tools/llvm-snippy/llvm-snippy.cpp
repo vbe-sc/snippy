@@ -547,17 +547,17 @@ std::vector<std::string> parseModelPluginList() {
   return Ret;
 }
 
-std::vector<std::string> parseDbPluginList() {
+std::string parseDbPluginList() {
   if ((!DbPluginFile.isSpecified() ||
        DbPluginFile.getValue() == "None"))
     snippy::fatal(formatv("--{0}"
                           " can only be used when value specified",
-                          CoSimModelPluginFilesList.ArgStr,
                           DbPluginFile.ArgStr));
 
-  std::vector<std::string> Ret{DbPluginFile.getValue()};
-  erase(Ret, "None");
-  return Ret;
+  auto PluginValue = DbPluginFile.getValue();
+  if (PluginValue.empty())
+    PluginValue = DbPluginFile.getDefault().getValue(); 
+  return PluginValue;
 }
 
 std::string parseDbPath() {
@@ -565,7 +565,6 @@ std::string parseDbPath() {
        DbPath.getValue() == "None"))
     snippy::fatal(formatv("--{0}"
                           " can only be used when value specified",
-                          CoSimModelPluginFilesList.ArgStr,
                           DbPath.ArgStr));
 
   auto PathValue = DbPath.getValue();
@@ -1079,8 +1078,8 @@ static void checkGlobalRegsSpillSettings(const SnippyTarget &Tgt,
 GeneratorSettings createGeneratorConfig(LLVMState &State, Config &&Cfg,
                                         RegPool &RP,
                                         ArrayRef<std::string> Models,
-                                        ArrayRef<std::string> Dbs,
-                                        ArrayRef<std::string> DbPath) {
+                                        std::string Dbs,
+                                        std::string DbPath) {
   auto &Ctx = State.getCtx();
   auto OutputFilename = getOutputFileBasename();
   auto SelfCheckPeriod = getSelfcheckPeriod();
@@ -1152,8 +1151,8 @@ GeneratorSettings createGeneratorConfig(LLVMState &State, Config &&Cfg,
 static FlowGenerator createFlowGenerator(Config &&Cfg, LLVMState &State,
                                          const OpcodeCache &OpCC,
                                          ArrayRef<std::string> Models, 
-                                         ArrayRef<std::string> Dbs,
-                                         ArrayRef<std::string> DbPath) {
+                                         std::string Dbs,
+                                         std::string DbPath) {
   RegPool RP;
   auto GenSettings = createGeneratorConfig(State, std::move(Cfg), RP, Models, Dbs, DbPath);
   return FlowGenerator(std::move(GenSettings), OpCC, std::move(RP));
