@@ -16,9 +16,13 @@ namespace llvm {
 namespace snippy {
     class DBManager {
         rvdb::RVDB_FunctionPointers DBTable;
+        rvdb::State::Builder Builder;
+        rvdb::State State;
     public:
-        DBManager(std::string);
+        DBManager(std::string, std::string);
         static const rvdb::RVDB_FunctionPointers &getDbEntryPoint(llvm::snippy::DynamicLibrary &DbLib);
+        rvdb::RVDB_FunctionPointers getDBTable() const { return DBTable; };
+        const rvdb::State& getState() const { return State; }
     };   
 } // namespace snippy
 } // namespace llvm

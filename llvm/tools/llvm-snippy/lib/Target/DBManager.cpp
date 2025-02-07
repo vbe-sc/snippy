@@ -27,9 +27,12 @@ static constexpr const char *DbInterfaceVersionSymbol =
 #undef D_XSTRINGIFY
 #undef D_STRINGIFY
 
-DBManager::DBManager(std::string LibraryName) {
-    llvm::snippy::DynamicLibrary dbLib(std::move(LibraryName)); // Create a named variable
-    DBTable = getDbEntryPoint(dbLib); // Pass the named variable
+DBManager::DBManager(std::string LibraryName, std::string DatabasePath)  {
+    llvm::snippy::DynamicLibrary dbLib(std::move(LibraryName)); 
+    DBTable = getDbEntryPoint(dbLib); 
+    Builder = rvdb::State::Builder(&DBTable);
+    Builder.setDataBasePath(DatabasePath.c_str());
+    State = Builder.build();
 }
 
 

@@ -12,7 +12,12 @@
 #include "snippy/Generator/SimulatorContext.h"
 #include "snippy/Target/Target.h"
 
+#include "../../Model/DBModel/SnippyDB.h"
+#include "../../Model/DBModel/SnippyDB.hpp"
+
+#include <cstddef>
 #include <random>
+#include <iostream>
 
 namespace llvm {
 namespace snippy {
@@ -104,7 +109,20 @@ ValuegramGenPolicy::generateOneInstrWithInitRegs(
   auto &State = ProgCtx.getLLVMState();
   const auto &Tgt = State.getSnippyTarget();
   const auto &RI = State.getRegInfo();
+  const auto &DbMng = ProgCtx.getDBManager();
   std::vector<InstructionRequest> InstrWithInitRegs;
+
+  // llvm::snippy::database::SnippyDB::Operands* ops = new llvm::snippy::database::SnippyDB::Operands();
+  // uint64_t rows = 3;
+  // uint64_t* ptr = (uint64_t*) malloc(ops->Size * rows * ops->Num);
+  // ops->Num = 1;
+  // ops->Size = 8;
+  // ops->Data = ptr;
+  // DbMng.getDBTable().getOperandsByRows(DbMng.getState().get(), ops, rows, llvm::snippy::database::SnippyDB::Order::Rand, 1);
+  // for (int i = 0; i < ops->Num * rows; i++) {
+  //   std::cout << ops->Data[i] << ' ';
+  //   if ((i + 1) % ops->Num == 0) std::cout << std::endl;
+  // }   
 
   InstructionRequest MainInstr{Opcode, {}};
   const auto &InstrDesc = State.getInstrInfo().get(Opcode);

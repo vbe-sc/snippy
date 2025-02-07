@@ -44,6 +44,7 @@ public:
     Builder(Builder &&OldBuild) = default;
     Builder &operator=(const Builder &) = delete;
     Builder &operator=(Builder &&OldBuild) = default;
+    Builder() = default;
     ~Builder() = default;
 
     Builder &setDataBasePath(const char* dataBasePath) {
@@ -53,11 +54,12 @@ public:
     
     State build() { return State{DBTable, &DBConfig}; }
   };
+
   State(const RVDB_FunctionPointers *DBTable, const RVDBConfig *Config)
       : pimpl(DBTable->initDatabase(Config), StateDeleter{DBTable}) {
     assert(DBTable);
   }
-
+  State() = default;
   RVDBState *get() { return pimpl.get(); }
   const RVDBState *get() const { return pimpl.get(); }
 };

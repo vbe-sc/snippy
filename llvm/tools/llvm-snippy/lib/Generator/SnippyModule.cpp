@@ -256,7 +256,7 @@ SnippyProgramContext::SnippyProgramContext(
       PLinker(std::make_unique<Linker>(
           State.getCtx(), Settings.Sections,
           Settings.MangleExportedNames ? Settings.EntryPointName : "")),
-      DB(std::make_unique<DBManager>(Settings.PathToDB)),
+      DB(std::make_unique<DBManager>(Settings.PathToDB, Settings.PathToDbLibrary)),
       StackPointer(Settings.StackPointer),
       MangleExportedNames(Settings.MangleExportedNames),
       EntryPointName(Settings.EntryPointName),

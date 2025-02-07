@@ -130,6 +130,7 @@ public:
   ~SnippyProgramContext();
 
   auto &getLLVMState() const { return *State; }
+  auto &getDBManager() const { return *DB; }
 
   StringRef getOutputSectionName(const Function &F) const {
     return F.hasSection() ? F.getSection() : ".text";
